@@ -12,6 +12,9 @@
             --dark-color: #333;
             --white-color: #ffffff;
             --accent-color: #4CAF50;
+            --yellow-color: #FFD700; /* Amarillo */
+            --blue-color: #3498db;   /* Azul */
+            --red-color: #e74c3c;    /* Rojo */
         }
         
         * {
@@ -73,7 +76,7 @@
         }
         
         .btn-danger {
-            background-color: #e74c3c;
+            background-color: var(--red-color);
             color: white;
         }
         
@@ -82,12 +85,12 @@
         }
         
         .btn-success {
-            background-color: var(--accent-color);
+            background-color: var(--red-color); /* Cambiado a rojo */
             color: white;
         }
         
         .btn-success:hover {
-            background-color: #3d8b40;
+            background-color: #c0392b;
         }
         
         .form-group {
@@ -145,6 +148,15 @@
             background: rgba(107, 190, 102, 0.2);
         }
         
+        .total-row {
+            background-color: rgba(107, 190, 102, 0.3);
+            font-weight: bold;
+        }
+        
+        .total-row td {
+            border-top: 2px solid var(--primary-color);
+        }
+        
         .nav-tabs {
             display: flex;
             margin-bottom: 15px;
@@ -187,7 +199,7 @@
         }
         
         .hidden {
-            display: none;
+            display: none !important;
         }
         
         .notification {
@@ -205,7 +217,7 @@
         }
         
         .notification.error {
-            background-color: #e74c3c;
+            background-color: var(--red-color);
             color: white;
         }
         
@@ -234,6 +246,13 @@
             gap: 10px;
             margin-bottom: 15px;
             align-items: center;
+        }
+        
+        .links-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-right: 15px;
         }
         
         .calculator {
@@ -285,28 +304,45 @@
         }
         
         .calc-btn.equals {
-            background-color: #3498db;
+            background-color: var(--blue-color);
             color: white;
         }
         
         .calc-btn.clear {
-            background-color: #e74c3c;
+            background-color: var(--red-color);
             color: white;
         }
         
         .dollar-link {
-            color: var(--primary-color);
+            color: var(--white-color);
             text-decoration: none;
             font-weight: bold;
             padding: 8px 12px;
-            border: 1px solid var(--primary-color);
+            border: 1px solid transparent;
             border-radius: 4px;
             transition: all 0.3s;
+            display: inline-block;
+            text-align: center;
         }
         
-        .dollar-link:hover {
-            background-color: var(--primary-color);
-            color: var(--secondary-color);
+        .bcv-link {
+            background-color: var(--yellow-color);
+            color: var(--dark-color);
+        }
+        
+        .bcv-link:hover {
+            background-color: #e6c200;
+            color: var(--dark-color);
+        }
+        
+        .usdt-link {
+            background-color: var(--blue-color);
+            color: var(--white-color);
+        }
+        
+        .usdt-link:hover {
+            background-color: #2980b9;
+            color: var(--white-color);
         }
         
         @media (max-width: 768px) {
@@ -337,6 +373,13 @@
                 flex-direction: column;
                 align-items: stretch;
             }
+            
+            .links-container {
+                flex-direction: row;
+                margin-right: 0;
+                margin-bottom: 10px;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -361,7 +404,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Main Application -->
         <div id="mainSection" class="container hidden">
             <div class="card">
@@ -374,15 +416,19 @@
                     <div class="nav-tabs">
                         <div class="nav-tab active" data-tab="general">General</div>
                         <div class="nav-tab" data-tab="expenses">Gastos</div>
-                        <div class="nav-tab" data-tab="employees">Empleados</div>
-                        <div class="nav-tab" data-tab="changePassword">Cambiar Contraseña</div>
-                        <div class="nav-tab" data-tab="summary">Resumen del Día</div>
+                        <div class="nav-tab admin-only" data-tab="employees">Empleados</div>
+                        <div class="nav-tab admin-only" data-tab="changePassword">Cambiar Contraseña</div>
+                        <div class="nav-tab admin-only" data-tab="summary">Resumen del Día</div>
                     </div>
                     
                     <!-- General Tab -->
                     <div id="generalTab" class="tab-content active">
                         <h3>Registro General</h3>
                         <div class="tools-container">
+                            <div class="links-container">
+                                <a href="https://www.bcv.org.ve/" target="_blank" class="dollar-link bcv-link">Dolar BCV</a>
+                                <a href="https://p2p.binance.com/trade/all-payments/USDT?fiat=VES" target="_blank" class="dollar-link usdt-link">Dolar USDT</a>
+                            </div>
                             <button id="addRowGeneral" class="btn btn-success">Agregar Fila</button>
                             <div class="calculator">
                                 <input type="text" id="calcDisplayGeneral" class="calculator-display" readonly>
@@ -409,7 +455,6 @@
                                     <button class="calc-btn operator" data-calc="sqrt">√</button>
                                 </div>
                             </div>
-                            <a href="https://p2p.binance.com/trade/all-payments/USDT?fiat=VES" target="_blank" class="dollar-link">Precio del dólar hoy</a>
                         </div>
                         <div style="overflow-x: auto;">
                             <table id="generalTable" class="table">
@@ -429,6 +474,19 @@
                                 <tbody>
                                     <!-- Rows will be added dynamically -->
                                 </tbody>
+                                <tfoot>
+                                    <tr class="total-row">
+                                        <td>Total</td>
+                                        <td>-</td>
+                                        <td id="totalCantidad">0</td>
+                                        <td id="totalPrecio">0</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td id="totalPrecioVes">0</td>
+                                        <td id="totalPrecioUSD">0</td>
+                                        <td>-</td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -437,6 +495,10 @@
                     <div id="expensesTab" class="tab-content">
                         <h3>Registro de Gastos</h3>
                         <div class="tools-container">
+                            <div class="links-container">
+                                <a href="https://www.bcv.org.ve/" target="_blank" class="dollar-link bcv-link">Dolar BCV</a>
+                                <a href="https://p2p.binance.com/trade/all-payments/USDT?fiat=VES" target="_blank" class="dollar-link usdt-link">Dolar USDT</a>
+                            </div>
                             <button id="addRowExpenses" class="btn btn-success">Agregar Fila</button>
                             <div class="calculator">
                                 <input type="text" id="calcDisplayExpenses" class="calculator-display" readonly>
@@ -463,7 +525,6 @@
                                     <button class="calc-btn operator" data-calc="sqrt">√</button>
                                 </div>
                             </div>
-                            <a href="https://p2p.binance.com/trade/all-payments/USDT?fiat=VES" target="_blank" class="dollar-link">Precio del dólar hoy</a>
                         </div>
                         <div style="overflow-x: auto;">
                             <table id="expensesTable" class="table">
@@ -486,14 +547,34 @@
                                 <tbody>
                                     <!-- Rows will be added dynamically -->
                                 </tbody>
+                                <tfoot>
+                                    <tr class="total-row">
+                                        <td>Total</td>
+                                        <td id="totalExpCantidad">0</td>
+                                        <td id="totalExpCantidadTotal">0</td>
+                                        <td>-</td>
+                                        <td id="totalExpEgresosTotal">0</td>
+                                        <td id="totalExpGastosOperaciones">0</td>
+                                        <td id="totalExpSalarios">0</td>
+                                        <td id="totalExpGastosAdm">0</td>
+                                        <td id="totalExpMantenimiento">0</td>
+                                        <td id="totalExpExpansiones">0</td>
+                                        <td id="totalExpMejoras">0</td>
+                                        <td>-</td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
                     
                     <!-- Employees Tab -->
-                    <div id="employeesTab" class="tab-content">
+                    <div id="employeesTab" class="tab-content admin-only">
                         <h3>Registro de Empleados</h3>
                         <div class="tools-container">
+                            <div class="links-container">
+                                <a href="https://www.bcv.org.ve/" target="_blank" class="dollar-link bcv-link">Dolar BCV</a>
+                                <a href="https://p2p.binance.com/trade/all-payments/USDT?fiat=VES" target="_blank" class="dollar-link usdt-link">Dolar USDT</a>
+                            </div>
                             <button id="addRowEmployees" class="btn btn-success">Agregar Fila</button>
                             <div class="calculator">
                                 <input type="text" id="calcDisplayEmployees" class="calculator-display" readonly>
@@ -520,7 +601,6 @@
                                     <button class="calc-btn operator" data-calc="sqrt">√</button>
                                 </div>
                             </div>
-                            <a href="https://p2p.binance.com/trade/all-payments/USDT?fiat=VES" target="_blank" class="dollar-link">Precio del dólar hoy</a>
                         </div>
                         <div style="overflow-x: auto;">
                             <table id="employeesTable" class="table">
@@ -545,12 +625,30 @@
                                 <tbody>
                                     <!-- Rows will be added dynamically -->
                                 </tbody>
+                                <tfoot>
+                                    <tr class="total-row">
+                                        <td>Total</td>
+                                        <td id="totalEmpDias">0</td>
+                                        <td id="totalEmpNoches">0</td>
+                                        <td id="totalEmpRedobles">0</td>
+                                        <td>-</td>
+                                        <td id="totalEmpSalarioDia">0</td>
+                                        <td id="totalEmpSalarioNoche">0</td>
+                                        <td id="totalEmpRedoblesPago">0</td>
+                                        <td>-</td>
+                                        <td id="totalEmpDescuentos">0</td>
+                                        <td id="totalEmpOtros">0</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
                     
                     <!-- Change Password Tab -->
-                    <div id="changePasswordTab" class="tab-content">
+                    <div id="changePasswordTab" class="tab-content admin-only">
                         <h3>Cambiar Contraseña</h3>
                         <div class="form-group">
                             <label for="currentPassword">Contraseña Actual</label>
@@ -568,7 +666,7 @@
                     </div>
                     
                     <!-- Summary Tab -->
-                    <div id="summaryTab" class="tab-content">
+                    <div id="summaryTab" class="tab-content admin-only">
                         <h3>Resumen del Día</h3>
                         <div id="summaryContent" class="summary-section">
                             <p>El resumen se generará automáticamente al final del día (11:59 PM).</p>
@@ -586,25 +684,20 @@
             </div>
         </div>
     </div>
-
     <!-- Notification -->
     <div id="notification" class="notification hidden"></div>
-
     <script>
         // User data
         const users = [
-            { username: 'SrChinchilla', password: 'Chin+58414-5043504' },
-            { username: 'SraChinchilla', password: 'Chin+58414-5043504' },
-            { username: 'trabajador1', password: 'Chin+58414-5043504' },
-            { username: 'trabajador2', password: 'Chin+58414-5043504' }
+            { username: 'SrChinchilla', password: 'Chin+58414-5043504', isAdmin: true },
+            { username: 'SraChinchilla', password: 'Chin+58414-5043504', isAdmin: true },
+            { username: 'trabajador1', password: 'Chin+58414-5043504', isAdmin: false },
+            { username: 'trabajador2', password: 'Chin+58414-5043504', isAdmin: false }
         ];
-
         // Get user data from localStorage or initialize
         let userData = JSON.parse(localStorage.getItem('userData')) || users.map(user => ({ ...user }));
-
         // Current user
         let currentUser = null;
-
         // DOM elements
         const loginSection = document.getElementById('loginSection');
         const mainSection = document.getElementById('mainSection');
@@ -654,7 +747,6 @@
                 operator: null
             }
         };
-
         // Initialize app
         function init() {
             // Load saved data
@@ -693,7 +785,6 @@
                 });
             });
         }
-
         // Setup calculator
         function setupCalculator(type) {
             const display = type === 'general' ? calcDisplayGeneral : 
@@ -708,7 +799,6 @@
                 });
             });
         }
-
         // Handle calculator input
         function handleCalculator(type, value) {
             const state = calcState[type];
@@ -763,7 +853,6 @@
             
             display.value = state.display;
         }
-
         // Perform calculation
         function performCalculation(operator, firstOperand, secondOperand) {
             switch (operator) {
@@ -779,7 +868,6 @@
                     return secondOperand;
             }
         }
-
         // Update date and time (Caracas time)
         function updateDateTime() {
             const now = new Date();
@@ -798,7 +886,6 @@
             
             currentDateTime.textContent = caracasTime.toLocaleDateString('es-ES', options);
         }
-
         // Login function
         function login() {
             const username = usernameInput.value.trim();
@@ -817,6 +904,14 @@
                 mainSection.classList.remove('hidden');
                 showNotification(`Bienvenido, ${username}`);
                 
+                // Check if user is admin and show/hide admin-only elements
+                if (!user.isAdmin) {
+                    // Hide admin-only tabs
+                    document.querySelectorAll('.admin-only').forEach(el => {
+                        el.classList.add('hidden');
+                    });
+                }
+                
                 // Clear form
                 usernameInput.value = '';
                 passwordInput.value = '';
@@ -824,7 +919,6 @@
                 showNotification('Usuario o contraseña incorrectos', 'error');
             }
         }
-
         // Logout function
         function logout() {
             currentUser = null;
@@ -832,7 +926,6 @@
             loginSection.classList.remove('hidden');
             showNotification('Sesión cerrada correctamente');
         }
-
         // Show notification
         function showNotification(message, type = 'success') {
             notification.textContent = message;
@@ -843,7 +936,6 @@
                 notification.classList.add('hidden');
             }, 3000);
         }
-
         // Switch tab
         function switchTab(tabId) {
             navTabs.forEach(tab => {
@@ -862,7 +954,6 @@
                 }
             });
         }
-
         // Add row to table
         function addRow(tableType) {
             let table;
@@ -880,42 +971,42 @@
                 row.innerHTML = `
                     <td><input type="text" class="form-control" placeholder="Material"></td>
                     <td><input type="text" class="form-control" placeholder="Tipo"></td>
-                    <td><input type="number" class="form-control" placeholder="Cantidad"></td>
-                    <td><input type="number" class="form-control" placeholder="Precio"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Cantidad"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Precio"></td>
                     <td><input type="text" class="form-control" placeholder="Recibido por"></td>
                     <td><input type="text" class="form-control" placeholder="Dentino final"></td>
-                    <td><input type="number" class="form-control" placeholder="Precio Ves"></td>
-                    <td><input type="number" class="form-control" placeholder="Precio USD"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Precio Ves"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Precio USD"></td>
                     <td><button class="btn btn-danger delete-row">Eliminar</button></td>
                 `;
             } else if (tableType === 'expenses') {
                 row.innerHTML = `
                     <td><input type="text" class="form-control" placeholder="Ingresos"></td>
-                    <td><input type="number" class="form-control" placeholder="Cantidad"></td>
-                    <td><input type="number" class="form-control" placeholder="Cantidad Total"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Cantidad"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Cantidad Total"></td>
                     <td><input type="text" class="form-control" placeholder="Egresos"></td>
-                    <td><input type="number" class="form-control" placeholder="Egresos Total"></td>
-                    <td><input type="number" class="form-control" placeholder="Gastos Operaciones"></td>
-                    <td><input type="number" class="form-control" placeholder="Salarios"></td>
-                    <td><input type="number" class="form-control" placeholder="Gastos Adm"></td>
-                    <td><input type="number" class="form-control" placeholder="Mantenimiento"></td>
-                    <td><input type="number" class="form-control" placeholder="Expansiones"></td>
-                    <td><input type="number" class="form-control" placeholder="Mejoras"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Egresos Total"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Gastos Operaciones"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Salarios"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Gastos Adm"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Mantenimiento"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Expansiones"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Mejoras"></td>
                     <td><button class="btn btn-danger delete-row">Eliminar</button></td>
                 `;
             } else if (tableType === 'employees') {
                 row.innerHTML = `
                     <td><input type="text" class="form-control" placeholder="Empleado"></td>
-                    <td><input type="number" class="form-control" placeholder="Días"></td>
-                    <td><input type="number" class="form-control" placeholder="Noches"></td>
-                    <td><input type="number" class="form-control" placeholder="Redobles"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Días"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Noches"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Redobles"></td>
                     <td><input type="text" class="form-control" placeholder="Cargo"></td>
-                    <td><input type="number" class="form-control" placeholder="Salario día"></td>
-                    <td><input type="number" class="form-control" placeholder="Salario noche"></td>
-                    <td><input type="number" class="form-control" placeholder="Redobles"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Salario día"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Salario noche"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Redobles"></td>
                     <td><input type="text" class="form-control" placeholder="Día libre"></td>
-                    <td><input type="number" class="form-control" placeholder="Descuentos"></td>
-                    <td><input type="number" class="form-control" placeholder="Otros"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Descuentos"></td>
+                    <td><input type="number" class="form-control input-numeric" placeholder="Otros"></td>
                     <td><input type="date" class="form-control"></td>
                     <td><input type="date" class="form-control"></td>
                     <td><button class="btn btn-danger delete-row">Eliminar</button></td>
@@ -928,17 +1019,122 @@
             row.querySelector('.delete-row').addEventListener('click', function() {
                 row.remove();
                 saveData(tableType);
+                calculateTotals(tableType);
             });
             
-            // Add event listeners to inputs for auto-save
+            // Add event listeners to inputs for auto-save and calculate totals
             const inputs = row.querySelectorAll('input');
             inputs.forEach(input => {
-                input.addEventListener('change', () => saveData(tableType));
+                input.addEventListener('change', () => {
+                    saveData(tableType);
+                    calculateTotals(tableType);
+                });
+                
+                // Add real-time calculation for numeric inputs
+                if (input.classList.contains('input-numeric')) {
+                    input.addEventListener('input', () => {
+                        calculateTotals(tableType);
+                    });
+                }
             });
             
             saveData(tableType);
+            calculateTotals(tableType);
         }
-
+        // Calculate totals for table
+        function calculateTotals(tableType) {
+            if (tableType === 'general') {
+                let totalCantidad = 0;
+                let totalPrecio = 0;
+                let totalPrecioVes = 0;
+                let totalPrecioUSD = 0;
+                
+                const rows = generalTable.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('.input-numeric');
+                    if (inputs.length >= 4) {
+                        totalCantidad += parseFloat(inputs[0].value) || 0;
+                        totalPrecio += parseFloat(inputs[1].value) || 0;
+                        totalPrecioVes += parseFloat(inputs[2].value) || 0;
+                        totalPrecioUSD += parseFloat(inputs[3].value) || 0;
+                    }
+                });
+                
+                document.getElementById('totalCantidad').textContent = totalCantidad.toFixed(2);
+                document.getElementById('totalPrecio').textContent = totalPrecio.toFixed(2);
+                document.getElementById('totalPrecioVes').textContent = totalPrecioVes.toFixed(2);
+                document.getElementById('totalPrecioUSD').textContent = totalPrecioUSD.toFixed(2);
+            } else if (tableType === 'expenses') {
+                let totalExpCantidad = 0;
+                let totalExpCantidadTotal = 0;
+                let totalExpEgresosTotal = 0;
+                let totalExpGastosOperaciones = 0;
+                let totalExpSalarios = 0;
+                let totalExpGastosAdm = 0;
+                let totalExpMantenimiento = 0;
+                let totalExpExpansiones = 0;
+                let totalExpMejoras = 0;
+                
+                const rows = expensesTable.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('.input-numeric');
+                    if (inputs.length >= 8) {
+                        totalExpCantidad += parseFloat(inputs[0].value) || 0;
+                        totalExpCantidadTotal += parseFloat(inputs[1].value) || 0;
+                        totalExpEgresosTotal += parseFloat(inputs[2].value) || 0;
+                        totalExpGastosOperaciones += parseFloat(inputs[3].value) || 0;
+                        totalExpSalarios += parseFloat(inputs[4].value) || 0;
+                        totalExpGastosAdm += parseFloat(inputs[5].value) || 0;
+                        totalExpMantenimiento += parseFloat(inputs[6].value) || 0;
+                        totalExpExpansiones += parseFloat(inputs[7].value) || 0;
+                        totalExpMejoras += parseFloat(inputs[8].value) || 0;
+                    }
+                });
+                
+                document.getElementById('totalExpCantidad').textContent = totalExpCantidad.toFixed(2);
+                document.getElementById('totalExpCantidadTotal').textContent = totalExpCantidadTotal.toFixed(2);
+                document.getElementById('totalExpEgresosTotal').textContent = totalExpEgresosTotal.toFixed(2);
+                document.getElementById('totalExpGastosOperaciones').textContent = totalExpGastosOperaciones.toFixed(2);
+                document.getElementById('totalExpSalarios').textContent = totalExpSalarios.toFixed(2);
+                document.getElementById('totalExpGastosAdm').textContent = totalExpGastosAdm.toFixed(2);
+                document.getElementById('totalExpMantenimiento').textContent = totalExpMantenimiento.toFixed(2);
+                document.getElementById('totalExpExpansiones').textContent = totalExpExpansiones.toFixed(2);
+                document.getElementById('totalExpMejoras').textContent = totalExpMejoras.toFixed(2);
+            } else if (tableType === 'employees') {
+                let totalEmpDias = 0;
+                let totalEmpNoches = 0;
+                let totalEmpRedobles = 0;
+                let totalEmpSalarioDia = 0;
+                let totalEmpSalarioNoche = 0;
+                let totalEmpRedoblesPago = 0;
+                let totalEmpDescuentos = 0;
+                let totalEmpOtros = 0;
+                
+                const rows = employeesTable.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('.input-numeric');
+                    if (inputs.length >= 8) {
+                        totalEmpDias += parseFloat(inputs[0].value) || 0;
+                        totalEmpNoches += parseFloat(inputs[1].value) || 0;
+                        totalEmpRedobles += parseFloat(inputs[2].value) || 0;
+                        totalEmpSalarioDia += parseFloat(inputs[3].value) || 0;
+                        totalEmpSalarioNoche += parseFloat(inputs[4].value) || 0;
+                        totalEmpRedoblesPago += parseFloat(inputs[5].value) || 0;
+                        totalEmpDescuentos += parseFloat(inputs[6].value) || 0;
+                        totalEmpOtros += parseFloat(inputs[7].value) || 0;
+                    }
+                });
+                
+                document.getElementById('totalEmpDias').textContent = totalEmpDias.toFixed(2);
+                document.getElementById('totalEmpNoches').textContent = totalEmpNoches.toFixed(2);
+                document.getElementById('totalEmpRedobles').textContent = totalEmpRedobles.toFixed(2);
+                document.getElementById('totalEmpSalarioDia').textContent = totalEmpSalarioDia.toFixed(2);
+                document.getElementById('totalEmpSalarioNoche').textContent = totalEmpSalarioNoche.toFixed(2);
+                document.getElementById('totalEmpRedoblesPago').textContent = totalEmpRedoblesPago.toFixed(2);
+                document.getElementById('totalEmpDescuentos').textContent = totalEmpDescuentos.toFixed(2);
+                document.getElementById('totalEmpOtros').textContent = totalEmpOtros.toFixed(2);
+            }
+        }
         // Save data to localStorage
         function saveData(tableType) {
             if (tableType === 'general') {
@@ -979,7 +1175,6 @@
                 localStorage.setItem('employeesData', JSON.stringify(rows));
             }
         }
-
         // Load data from localStorage
         function loadGeneralData() {
             const data = JSON.parse(localStorage.getItem('generalData')) || [];
@@ -988,12 +1183,12 @@
                 row.innerHTML = `
                     <td><input type="text" class="form-control" value="${rowData[0] || ''}"></td>
                     <td><input type="text" class="form-control" value="${rowData[1] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[2] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[3] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[2] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[3] || ''}"></td>
                     <td><input type="text" class="form-control" value="${rowData[4] || ''}"></td>
                     <td><input type="text" class="form-control" value="${rowData[5] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[6] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[7] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[6] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[7] || ''}"></td>
                     <td><button class="btn btn-danger delete-row">Eliminar</button></td>
                 `;
                 generalTable.appendChild(row);
@@ -1002,32 +1197,45 @@
                 row.querySelector('.delete-row').addEventListener('click', function() {
                     row.remove();
                     saveData('general');
+                    calculateTotals('general');
                 });
                 
-                // Add event listeners to inputs for auto-save
+                // Add event listeners to inputs for auto-save and calculate totals
                 const inputs = row.querySelectorAll('input');
                 inputs.forEach(input => {
-                    input.addEventListener('change', () => saveData('general'));
+                    input.addEventListener('change', () => {
+                        saveData('general');
+                        calculateTotals('general');
+                    });
+                    
+                    // Add real-time calculation for numeric inputs
+                    if (input.classList.contains('input-numeric')) {
+                        input.addEventListener('input', () => {
+                            calculateTotals('general');
+                        });
+                    }
                 });
             });
+            
+            // Calculate initial totals
+            calculateTotals('general');
         }
-
         function loadExpensesData() {
             const data = JSON.parse(localStorage.getItem('expensesData')) || [];
             data.forEach(rowData => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><input type="text" class="form-control" value="${rowData[0] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[1] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[2] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[1] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[2] || ''}"></td>
                     <td><input type="text" class="form-control" value="${rowData[3] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[4] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[5] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[6] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[7] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[8] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[9] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[10] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[4] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[5] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[6] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[7] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[8] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[9] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[10] || ''}"></td>
                     <td><button class="btn btn-danger delete-row">Eliminar</button></td>
                 `;
                 expensesTable.appendChild(row);
@@ -1036,32 +1244,45 @@
                 row.querySelector('.delete-row').addEventListener('click', function() {
                     row.remove();
                     saveData('expenses');
+                    calculateTotals('expenses');
                 });
                 
-                // Add event listeners to inputs for auto-save
+                // Add event listeners to inputs for auto-save and calculate totals
                 const inputs = row.querySelectorAll('input');
                 inputs.forEach(input => {
-                    input.addEventListener('change', () => saveData('expenses'));
+                    input.addEventListener('change', () => {
+                        saveData('expenses');
+                        calculateTotals('expenses');
+                    });
+                    
+                    // Add real-time calculation for numeric inputs
+                    if (input.classList.contains('input-numeric')) {
+                        input.addEventListener('input', () => {
+                            calculateTotals('expenses');
+                        });
+                    }
                 });
             });
+            
+            // Calculate initial totals
+            calculateTotals('expenses');
         }
-
         function loadEmployeesData() {
             const data = JSON.parse(localStorage.getItem('employeesData')) || [];
             data.forEach(rowData => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><input type="text" class="form-control" value="${rowData[0] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[1] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[2] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[3] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[1] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[2] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[3] || ''}"></td>
                     <td><input type="text" class="form-control" value="${rowData[4] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[5] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[6] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[7] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[5] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[6] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[7] || ''}"></td>
                     <td><input type="text" class="form-control" value="${rowData[8] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[9] || ''}"></td>
-                    <td><input type="number" class="form-control" value="${rowData[10] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[9] || ''}"></td>
+                    <td><input type="number" class="form-control input-numeric" value="${rowData[10] || ''}"></td>
                     <td><input type="date" class="form-control" value="${rowData[11] || ''}"></td>
                     <td><input type="date" class="form-control" value="${rowData[12] || ''}"></td>
                     <td><button class="btn btn-danger delete-row">Eliminar</button></td>
@@ -1072,16 +1293,29 @@
                 row.querySelector('.delete-row').addEventListener('click', function() {
                     row.remove();
                     saveData('employees');
+                    calculateTotals('employees');
                 });
                 
-                // Add event listeners to inputs for auto-save
+                // Add event listeners to inputs for auto-save and calculate totals
                 const inputs = row.querySelectorAll('input');
                 inputs.forEach(input => {
-                    input.addEventListener('change', () => saveData('employees'));
+                    input.addEventListener('change', () => {
+                        saveData('employees');
+                        calculateTotals('employees');
+                    });
+                    
+                    // Add real-time calculation for numeric inputs
+                    if (input.classList.contains('input-numeric')) {
+                        input.addEventListener('input', () => {
+                            calculateTotals('employees');
+                        });
+                    }
                 });
             });
+            
+            // Calculate initial totals
+            calculateTotals('employees');
         }
-
         // Change password
         function changePassword() {
             const currentPassword = document.getElementById('currentPassword').value;
@@ -1118,7 +1352,6 @@
                 showNotification('Contraseña cambiada correctamente');
             }
         }
-
         // Check if it's time to generate daily summary
         function checkDailySummary() {
             const now = new Date();
@@ -1130,7 +1363,6 @@
                 generateDailySummary();
             }
         }
-
         // Generate daily summary
         function generateDailySummary() {
             const today = new Date();
@@ -1206,8 +1438,12 @@
             localStorage.removeItem('generalData');
             localStorage.removeItem('expensesData');
             localStorage.removeItem('employeesData');
+            
+            // Recalculate totals after clearing tables
+            calculateTotals('general');
+            calculateTotals('expenses');
+            calculateTotals('employees');
         }
-
         // Download PDF (simplified - in a real app you would use a library like jsPDF)
         function downloadPDF() {
             const summaries = JSON.parse(localStorage.getItem('dailySummaries')) || [];
@@ -1377,7 +1613,6 @@
             
             showNotification('PDF descargado correctamente');
         }
-
         // Download Excel (simplified - in a real app you would use a library like SheetJS)
         function downloadExcel() {
             const summaries = JSON.parse(localStorage.getItem('dailySummaries')) || [];
@@ -1434,7 +1669,6 @@
             
             showNotification('Excel descargado correctamente');
         }
-
         // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', init);
     </script>
